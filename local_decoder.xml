@@ -1,19 +1,15 @@
-<decoder_list>
-
   <decoder name="irondoor">
     <prematch>IronDoor </prematch>
   </decoder>
 
   <decoder name="irondoor_denied">
     <parent>irondoor</parent>
-    <regex offset="after_prematch">ACCESS_DENIED user_id=([A-Za-z0-9]+) badge=([A-Za-z0-9]+) door=([A-Za-z0-9_-]+) reason=([A-Za-z0-9_]+) attempt=([0-9]+)</regex>
+    <regex>ACCESS_DENIED user_id=([A-Za-z0-9]+) badge=([A-Za-z0-9]+) door=([A-Za-z0-9_-]+) reason=([A-Za-z0-9_]+) attempt=([0-9]+)</regex>
     <order>user, id, door, reason, extra_data</order>
   </decoder>
 
   <decoder name="irondoor_granted">
     <parent>irondoor</parent>
-    <regex offset="after_prematch">ACCESS_GRANTED user_id=([A-Za-z0-9]+) badge=([A-Za-z0-9]+) door=([A-Za-z0-9_-]+) reason=([A-Za-z0-9_]+)</regex>
+    <regex>ACCESS_GRANTED user_id=([A-Za-z0-9]+) badge=([A-Za-z0-9]+) door=([A-Za-z0-9_-]+) reason=([A-Za-z0-9_]+)</regex>
     <order>user, id, door, reason</order>
   </decoder>
-
-</decoder_list>
