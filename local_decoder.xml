@@ -1,18 +1,20 @@
-<!-- Parent decoder: matches any IronDoor log -->
+<!-- Parent decoder: handles syslog-wrapped IronDoor logs -->
 <decoder name="irondoor">
-  <prematch>^IronDoor </prematch>
+  <prematch>IronDoor </prematch>
 </decoder>
 
-<!-- Child decoder: ACCESS_DENIED with attempt field -->
+<!-- Child: ACCESS_DENIED -->
 <decoder name="irondoor_denied">
   <parent>irondoor</parent>
-  <regex>^IronDoor (ACCESS_DENIED) user_id=(\w+) badge=(\w+) door=(\S+) reason=(\w+) attempt=(\d+)</regex>
-  <order>action, user, id, door, reason, extra_data</order>
+  <prematch offset="after_prematch">ACCESS_DENIED</prematch>
+  <regex offset="after_prematch">user_id=(\w+) badge=(\w+) door=(\S+) reason=(\w+) attempt=(\d+)</regex>
+  <order>user, id, door, reason, extra_data</order>
 </decoder>
 
-<!-- Child decoder: ACCESS_GRANTED (no attempt field) -->
+<!-- Child: ACCESS_GRANTED -->
 <decoder name="irondoor_granted">
   <parent>irondoor</parent>
-  <regex>^IronDoor (ACCESS_GRANTED) user_id=(\w+) badge=(\w+) door=(\S+) reason=(\w+)</regex>
-  <order>action, user, id, door, reason</order>
+  <prematch offset="after_prematch">ACCESS_GRANTED</prematch>
+  <regex offset="after_prematch">user_id=(\w+) badge=(\w+) door=(\S+) reason=(\w+)</regex>
+  <order>user, id, door, reason</order>
 </decoder>
