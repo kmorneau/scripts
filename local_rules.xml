@@ -1,0 +1,51 @@
+<group name="irondoor,physical_access,">
+
+  <!-- Base rule: any IronDoor event -->
+  <rule id="100200" level="0">
+    <decoded_as>irondoor</decoded_as>
+    <description>IronDoor: Physical access system event</description>
+    <group>irondoor</group>
+  </rule>
+
+  <!-- ACCESS_GRANTED - informational (level 3) -->
+  <rule id="100201" level="3">
+    <if_sid>100200</if_sid>
+    <field name="action">ACCESS_GRANTED</field>
+    <description>IronDoor: Access granted to $(user) at door $(door)</description>
+    <group>authentication_success,</group>
+    <mitre>
+      <id>T1078</id>
+    </mitre>
+  </rule>
+
+  <!-- ACCESS_DENIED - warning (level 7) -->
+  <rule id="100202" level="7">
+    <if_sid>100200</if_sid>
+    <field name="action">ACCESS_DENIED</field>
+    <description>IronDoor: Access DENIED for $(user) at door $(door) - reason: $(reason)</description>
+    <group>authentication_failed,</group>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+  </rule>
+
+  <!-- Brute force: 5 denials in 2 minutes from same user -->
+  <rule id="100203" level="12" frequency="5" timeframe="120">
+    <if_matched_sid>100202</if_matched_sid>
+    <same_field>user</same_field>
+    <description>IronDoor: Multiple access failures for $(user) - possible tailgating or brute force</description>
+    <group>authentication_failed,brute_force,</group>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+  </rule>
+
+  <!-- Specific: INVALID_PIN reason -->
+  <rule id="100204" level="8">
+    <if_sid>100202</if_sid>
+    <field name="reason">INVALID_PIN</field>
+    <description>IronDoor: Invalid PIN attempt by $(user) on door $(door)</description>
+    <group>authentication_failed,</group>
+  </rule>
+
+</group>
