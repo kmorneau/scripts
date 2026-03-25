@@ -336,7 +336,7 @@ switch ($choice) {
     }
     
     if ($choice -ne "Q") {
-        Write-Host "\nPress Enter to return to the menu..."
+        Write-Host "Press Enter to return to the menu..."
         Read-Host | Out-Null
     }
 } while ($true)
