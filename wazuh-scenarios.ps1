@@ -32,7 +32,7 @@ function Write-WazuhEvent {
             $eventType = $typeMap[$Type]
             
             # Use EventCreate.exe instead of Write-EventLog
-            $process = Start-Process -FilePath "EventCreate.exe" -ArgumentList "/L`,$LogName /T`,$eventType /ID`,$Id /SO`,$Source /D`,"$Message"" -NoNewWindow -Wait -PassThru
+            $process = Start-Process -FilePath "EventCreate.exe" -ArgumentList "/L", $LogName, "/T", $eventType, "/ID", $Id, "/SO", $Source, "/D", $Message -NoNewWindow -Wait -PassThru
             if ($process.ExitCode -eq 0) {
                 return
             }
@@ -75,7 +75,7 @@ function Scenario2-IronDoor {
         Start-Sleep -Milliseconds 300
     }
     $msgOK = "IronDoor ACCESS_GRANTED user_id=EMP999 badge=0xCD34 door=DataCenter-1 reason=VALID_PIN"
-    Write-WazuhEvent -Id 2002 -Type Error -Message $msgOK
+    Write-WazuhEvent -Id 2002 -Type Information -Message $msgOK
     Write-Host "  [Success] EMP999 granted access" -ForegroundColor Green
     Write-Host "[+] IronDoor scenario complete." -ForegroundColor Green
 }
@@ -172,7 +172,7 @@ function Scenario7-Downtime {
     Start-Sleep -Seconds 1
     
     $msg3 = "Downtime simulation: WEB01 recovered, service nginx running"
-    Write-WazuhEvent -Id 7003 -Type Error -Message $msg3
+    Write-WazuhEvent -Id 7003 -Type Information -Message $msg3
     Write-Host "  [Success] Service recovered" -ForegroundColor Green
 
     $msg4 = "Downtime simulation: HOST_DOWN name=web01.example.com ip=192.0.2.20 duration=300s reason=No heartbeat"
@@ -182,7 +182,7 @@ function Scenario7-Downtime {
     Start-Sleep -Seconds 1
     
     $msg5 = "Downtime simulation: HOST_RECOVERED name=web01.example.com ip=192.0.2.20"
-    Write-WazuhEvent -Id 7005 -Type Error -Message $msg5
+    Write-WazuhEvent -Id 7005 -Type Information -Message $msg5
     Write-Host "  [Success] Host recovered" -ForegroundColor Green
     
     Write-Host "[+] Downtime scenario complete." -ForegroundColor Green
