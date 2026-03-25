@@ -31,13 +31,17 @@ function Write-WazuhEvent {
             }
             $eventType = $typeMap[$Type]
             
-            # Use EventCreate.exe instead of Write-EventLog
-            $process = Start-Process -FilePath "EventCreate.exe" -ArgumentList "/L", $LogName, "/T", $eventType, "/ID", $Id, "/SO", $Source, "/D", $Message -NoNewWindow -Wait -PassThru
-            if ($process.ExitCode -eq 0) {
+            # Use cmd /c to call EventCreate.exe directly (better compatibility)
+            # Event IDs must be 1-1000 for custom events
+            $cmd = "eventcreate /L $LogName /T $eventType /ID $Id /SO $Source /D `"$Message`""
+            $output = cmd /c $cmd 2>&1
+            $exitCode = $LASTEXITCODE
+            
+            if ($exitCode -eq 0) {
                 return
             }
             else {
-                throw "EventCreate.exe failed with exit code $($process.ExitCode)"
+                throw "EventCreate.exe failed with exit code $exitCode. Output: $output"
             }
         }
         catch {
