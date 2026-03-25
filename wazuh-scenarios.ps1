@@ -63,7 +63,7 @@ function Scenario1-DDoS {
     for ($i = 1; $i -le 50; $i++) {
         $src = "203.0.113.$i"
         $msg = "DDoS simulation: blocked TCP SYN to 192.0.2.10:80 from $src via firewall UFW."
-        Write-WazuhEvent -Id 1001 -Type Error -Message $msg
+        Write-WazuhEvent -Id 901 -Type Error -Message $msg
         Write-Host "  [$i/50] Blocked from $src" -ForegroundColor Yellow
         Start-Sleep -Milliseconds 50
     }
@@ -74,12 +74,12 @@ function Scenario2-IronDoor {
     Write-Host "`n[*] Starting IronDoor Physical Access Scenario..." -ForegroundColor Cyan
     for ($i = 1; $i -le 3; $i++) {
         $msg = "IronDoor ACCESS_DENIED user_id=EMP332 badge=0xAB12 door=DataCenter-1 reason=INVALID_PIN attempt=$i"
-        Write-WazuhEvent -Id 2001 -Type Error -Message $msg
+        Write-WazuhEvent -Id 902 -Type Error -Message $msg
         Write-Host "  [Attempt $i] Access denied - Invalid PIN" -ForegroundColor Yellow
         Start-Sleep -Milliseconds 300
     }
     $msgOK = "IronDoor ACCESS_GRANTED user_id=EMP999 badge=0xCD34 door=DataCenter-1 reason=VALID_PIN"
-    Write-WazuhEvent -Id 2002 -Type Information -Message $msgOK
+    Write-WazuhEvent -Id 903 -Type Information -Message $msgOK
     Write-Host "  [Success] EMP999 granted access" -ForegroundColor Green
     Write-Host "[+] IronDoor scenario complete." -ForegroundColor Green
 }
@@ -90,19 +90,19 @@ function Scenario3-Auth {
     # Failed login attempts
     for ($i = 1; $i -le 5; $i++) {
         $msg = "Authentication attack: failed login attempt user=admin from 198.51.100.$i via SSH attempt=$i"
-        Write-WazuhEvent -Id 3001 -Type Error -Message $msg
+        Write-WazuhEvent -Id 801 -Type Error -Message $msg
         Write-Host "  [Failed Attempt $i] SSH login failure from 198.51.100.$i" -ForegroundColor Yellow
         Start-Sleep -Milliseconds 200
     }
     
     # Suspicious account activity
     $msg2 = "Authentication attack: privilege escalation attempt user=john sudo command='whoami' denied"
-    Write-WazuhEvent -Id 3002 -Type Error -Message $msg2
+    Write-WazuhEvent -Id 802 -Type Error -Message $msg2
     Write-Host "  [Alert] Sudo escalation denied for user john" -ForegroundColor Red
     
     # Account lockout
     $msg3 = "Authentication attack: account lockout triggered user=admin after 5 failed attempts"
-    Write-WazuhEvent -Id 3003 -Type Error -Message $msg3
+    Write-WazuhEvent -Id 803 -Type Error -Message $msg3
     Write-Host "  [Security] Admin account locked due to multiple failures" -ForegroundColor Yellow
     
     Write-Host "[+] Authentication attack scenario complete." -ForegroundColor Green
@@ -112,15 +112,15 @@ function Scenario4-Phishing {
     Write-Host "`n[*] Starting Phishing Email Scenario..." -ForegroundColor Cyan
     
     $msg1 = "Phishing simulation: mail gateway blocked from=<support@micr0s0ft-secure.com> to=<user1@example.com> reason=phishing_signature_hit"
-    Write-WazuhEvent -Id 4001 -Type Error -Message $msg1
+    Write-WazuhEvent -Id 401 -Type Error -Message $msg1
     Write-Host "  [Blocked] Suspicious email from support@micr0s0ft-secure.com" -ForegroundColor Yellow
 
     $msg2 = "Phishing simulation: user1@example.com clicked suspicious URL http://malicious-login.example/phish"
-    Write-WazuhEvent -Id 4002 -Type Error -Message $msg2
+    Write-WazuhEvent -Id 402 -Type Error -Message $msg2
     Write-Host "  [Alert] User clicked malicious link" -ForegroundColor Red
     
     $msg3 = "Phishing simulation: credential harvester detected sending data to external IP 203.0.113.50"
-    Write-WazuhEvent -Id 4003 -Type Error -Message $msg3
+    Write-WazuhEvent -Id 403 -Type Error -Message $msg3
     Write-Host "  [Critical] Credentials exfiltrated to external server" -ForegroundColor Red
     
     Write-Host "[+] Phishing scenario complete." -ForegroundColor Green
@@ -131,13 +131,13 @@ function Scenario5-Exfiltration {
     
     for ($i = 1; $i -le 10; $i++) {
         $msg = "Data exfiltration simulation: outbound 5MB transfer from 192.0.2.10 to 203.0.113.200:443 (#$i)"
-        Write-WazuhEvent -Id 5001 -Type Error -Message $msg
+        Write-WazuhEvent -Id 501 -Type Error -Message $msg
         Write-Host "  [$i/10] 5MB transferred to suspicious external IP" -ForegroundColor Yellow
         Start-Sleep -Milliseconds 100
     }
     
     $msg2 = "Data exfiltration simulation: scp user=alice file=C:\Secret\plan.txt dest=203.0.113.150:/upload/plan.txt"
-    Write-WazuhEvent -Id 5002 -Type Error -Message $msg2
+    Write-WazuhEvent -Id 502 -Type Error -Message $msg2
     Write-Host "  [Critical] Confidential file exfiltrated via SCP" -ForegroundColor Red
     
     Write-Host "[+] Data exfiltration scenario complete." -ForegroundColor Green
@@ -148,7 +148,7 @@ function Scenario6-Ransomware {
     
     for ($i = 1; $i -le 50; $i++) {
         $msg = "Ransomware simulation: file rename C:\Share\docs\file$i.docx -> C:\Share\docs\file$i.docx.encrypted"
-        Write-WazuhEvent -Id 6001 -Type Error -Message $msg
+        Write-WazuhEvent -Id 601 -Type Error -Message $msg
         if ($i % 10 -eq 0) {
             Write-Host "  [$i/50] Files encrypted..." -ForegroundColor Yellow
         }
@@ -156,7 +156,7 @@ function Scenario6-Ransomware {
     }
     
     $note = "Ransomware simulation: ransom note created C:\Share\README_RESTORE_FILES.txt"
-    Write-WazuhEvent -Id 6002 -Type Error -Message $note
+    Write-WazuhEvent -Id 602 -Type Error -Message $note
     Write-Host "  [Critical] Ransom note created - 50 files encrypted" -ForegroundColor Red
     
     Write-Host "[+] Ransomware scenario complete." -ForegroundColor Green
@@ -166,27 +166,27 @@ function Scenario7-Downtime {
     Write-Host "`n[*] Starting Service Downtime Scenario..." -ForegroundColor Cyan
     
     $msg1 = "Downtime simulation: nginx service crash on WEB01 status=1/FAILURE"
-    Write-WazuhEvent -Id 7001 -Type Error -Message $msg1
+    Write-WazuhEvent -Id 701 -Type Error -Message $msg1
     Write-Host "  [Alert] nginx service crashed on WEB01" -ForegroundColor Red
     
     $msg2 = "Downtime simulation: nginx service auto-restart on WEB01 restart_counter=3"
-    Write-WazuhEvent -Id 7002 -Type Error -Message $msg2
+    Write-WazuhEvent -Id 702 -Type Error -Message $msg2
     Write-Host "  [Info] Service restarting (attempt 3)..." -ForegroundColor Cyan
     
     Start-Sleep -Seconds 1
     
     $msg3 = "Downtime simulation: WEB01 recovered, service nginx running"
-    Write-WazuhEvent -Id 7003 -Type Information -Message $msg3
+    Write-WazuhEvent -Id 703 -Type Information -Message $msg3
     Write-Host "  [Success] Service recovered" -ForegroundColor Green
 
     $msg4 = "Downtime simulation: HOST_DOWN name=web01.example.com ip=192.0.2.20 duration=300s reason=No heartbeat"
-    Write-WazuhEvent -Id 7004 -Type Error -Message $msg4
+    Write-WazuhEvent -Id 704 -Type Error -Message $msg4
     Write-Host "  [Alert] Host down - no heartbeat for 300s" -ForegroundColor Red
     
     Start-Sleep -Seconds 1
     
     $msg5 = "Downtime simulation: HOST_RECOVERED name=web01.example.com ip=192.0.2.20"
-    Write-WazuhEvent -Id 7005 -Type Information -Message $msg5
+    Write-WazuhEvent -Id 705 -Type Information -Message $msg5
     Write-Host "  [Success] Host recovered" -ForegroundColor Green
     
     Write-Host "[+] Downtime scenario complete." -ForegroundColor Green
@@ -197,7 +197,7 @@ function Scenario8-Botnet {
     
     for ($i = 1; $i -le 20; $i++) {
         $msg = "Botnet simulation: outbound beacon from 192.0.2.30 to 198.51.100.200:8080 interval=60s (#$i)"
-        Write-WazuhEvent -Id 8001 -Type Error -Message $msg
+        Write-WazuhEvent -Id 801 -Type Error -Message $msg
         if ($i % 5 -eq 0) {
             Write-Host "  [$i/20] Botnet beacons detected" -ForegroundColor Yellow
         }
@@ -205,11 +205,11 @@ function Scenario8-Botnet {
     }
     
     $dns1 = "Botnet simulation: DNS query 192.0.2.30 -> abcdefghij.malware-c2.example"
-    Write-WazuhEvent -Id 8002 -Type Error -Message $dns1
+    Write-WazuhEvent -Id 802 -Type Error -Message $dns1
     Write-Host "  [Alert] Suspicious DNS query to C2 domain" -ForegroundColor Yellow
     
     $dns2 = "Botnet simulation: DNS query 192.0.2.30 -> xyz1234.malware-c2.example"
-    Write-WazuhEvent -Id 8003 -Type Error -Message $dns2
+    Write-WazuhEvent -Id 803 -Type Error -Message $dns2
     Write-Host "  [Alert] Second C2 domain contacted" -ForegroundColor Yellow
     
     Write-Host "[+] Botnet scenario complete." -ForegroundColor Green
@@ -219,15 +219,15 @@ function Scenario9-AUP {
     Write-Host "`n[*] Starting Acceptable Use Policy Violation Scenario..." -ForegroundColor Cyan
     
     $proxy1 = "AUP simulation: proxy ACCESS_DENIED user=student1 url=http://gambling-example.com category=Gambling"
-    Write-WazuhEvent -Id 9001 -Type Error -Message $proxy1
+    Write-WazuhEvent -Id 901 -Type Error -Message $proxy1
     Write-Host "  [Blocked] Gambling site access denied" -ForegroundColor Yellow
     
     $proxy2 = "AUP simulation: proxy ACCESS_DENIED user=student1 url=http://social-media.example/video123 category=StreamingMedia"
-    Write-WazuhEvent -Id 9002 -Type Error -Message $proxy2
+    Write-WazuhEvent -Id 902 -Type Error -Message $proxy2
     Write-Host "  [Blocked] Streaming media access denied" -ForegroundColor Yellow
     
     $audit1 = "AUP simulation: unauthorized software install attempt 'winget install tor' by user=student1"
-    Write-WazuhEvent -Id 9003 -Type Error -Message $audit1
+    Write-WazuhEvent -Id 903 -Type Error -Message $audit1
     Write-Host "  [Alert] Unauthorized software installation blocked" -ForegroundColor Red
     
     Write-Host "[+] AUP violation scenario complete." -ForegroundColor Green
